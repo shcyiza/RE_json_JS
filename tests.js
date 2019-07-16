@@ -1,11 +1,12 @@
 const HandleTimeRange = require('./lib/HandleTimeRange')
-const {REday} = require('./lib/utils')
+const {oStmntAttrs, getValidYears} = require('./lib/helpers')
+const {DateStmnt} = require('./lib/StatementObjects')
 const assert = require('assert');
 
 
 describe('Rejson first node implementation', function() {
     
-    describe('Handle intputed and saved timerange to have the shortest time frame', () => {
+    describe('Handle inputed and saved timerange to have the shortest time frame', () => {
         let inputed = ["20190408", "20191230"]
         let saved = {s:"20190101", e:"20190722"}
         let result = HandleTimeRange(inputed, saved)
@@ -70,5 +71,42 @@ describe('Rejson first node implementation', function() {
         });
     })
 
-    // console.log(new REday("20190403").getYear().mapTill(2026, n => n))
+    // const rejson_str = '{"tRng":{"s":"20170101","e":"20210722"},"oStmnt":[["DoY",["1225", "0215"]]], "separation":0}'
+
+    describe('Valid periods helpers test', function() {
+        describe('getValidYears helper function', function() {
+            let inputed = ["20180408", "20220722"]
+            let saved = {s:"20170403"}
+            let time_range = HandleTimeRange(inputed, saved)
+            let reference_date_stmnt = new DateStmnt(saved.s)
+
+            it('should give consecutive years with no separation.', () => {
+                const result = getValidYears(reference_date_stmnt, time_range)
+                const expected = [2018, 2019, 2020, 2021, 2022]
+                
+                assert.deepStrictEqual(result, expected)
+            })
+
+            it('should give consecutive years with a separation of 1 year.', () => {
+                const result = getValidYears(reference_date_stmnt, time_range, 1)
+                const expected = [2019, 2021]
+                
+                assert.deepStrictEqual(result, expected)
+            })
+
+            it('should give consecutive years with a separation of 2 years.', () => {
+                inputed = ["20180408", "20270722"]
+                time_range = HandleTimeRange(inputed, saved)
+                const result = getValidYears(reference_date_stmnt, time_range, 2)
+                const expected = [2020, 2023, 2026]
+                
+                assert.deepStrictEqual(result, expected)
+            })
+        })
+
+        describe('getValidMonths helper function', function() {
+
+        })
+    })
+
 })
