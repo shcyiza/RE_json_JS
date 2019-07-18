@@ -1,5 +1,5 @@
 const HandleTimeRange = require('./lib/HandleTimeRange')
-const {oStmntAttrs, getValidYears} = require('./lib/helpers')
+const {oStmntAttrs, getValidYears, getValidMonths} = require('./lib/helpers')
 const {DateStmnt} = require('./lib/StatementObjects')
 const assert = require('assert');
 
@@ -105,7 +105,17 @@ describe('Rejson first node implementation', function() {
         })
 
         describe('getValidMonths helper function', function() {
+            let saved = {s:"20170403"}
+            let reference_date_stmnt = new DateStmnt(saved.s)
+            let inputed = ["20180408", "20180722"]
+            let time_range = HandleTimeRange(inputed, saved)
 
+            it('should give consecutive years with a separation of 2 years.', () => {
+                const result = getValidMonths(reference_date_stmnt, time_range, 2)
+                const expected = [4, 5, 6, 7]
+                
+                assert.deepStrictEqual(result, expected)
+            })
         })
     })
 
